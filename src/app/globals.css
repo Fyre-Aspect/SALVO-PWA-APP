@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ocean-dark: #0a0f1a;
+  --color-ocean-darker: #050a12;
+  --color-ocean-deep: #001a33;
+  --color-ocean-surface: #003d66;
+  --color-ocean-blue: #0066cc;
+  --color-ocean-cyan: #00e5ff;
+  --color-ocean-cyan-dim: #00b8d4;
+  --color-ocean-glow: rgba(0, 229, 255, 0.15);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-ocean-dark);
+  color: #e0e8f0;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ocean-darker);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ocean-surface);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ocean-blue);
+}
+
+/* Glow utility */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3), 0 0 60px rgba(0, 229, 255, 0.1);
+}
+
+.glow-cyan-sm {
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+}
+
+.text-glow-cyan {
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+}
+
+/* Glass card utility */
+.glass-card {
+  background: rgba(0, 26, 51, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 229, 255, 0.1);
+}
