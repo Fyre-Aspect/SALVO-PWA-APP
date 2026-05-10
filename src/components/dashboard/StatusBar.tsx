@@ -1,17 +1,47 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { systemStates, stateColors, type SystemState } from "@/data/mock";
+import { useDistressStream } from "@/lib/useDistressStream";
+
+const STATE_INDEX: Record<SystemState, number> = Object.fromEntries(
+  systemStates.map((s, i) => [s, i])
+) as Record<SystemState, number>;
 
 export default function StatusBar() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const { latest } = useDistressStream();
+  const demoTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Demo cycling when no live data
   useEffect(() => {
-    const interval = setInterval(() => {
+    demoTimerRef.current = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % systemStates.length);
     }, 2500);
-    return () => clearInterval(interval);
+    return () => {
+      if (demoTimerRef.current) clearInterval(demoTimerRef.current);
+    };
   }, []);
+
+  // Jump to real state on live alert
+  useEffect(() => {
+    if (!latest) return;
+    if (demoTimerRef.current) {
+      clearInterval(demoTimerRef.current);
+      demoTimerRef.current = null;
+    }
+    const targetState: SystemState =
+      latest.alert.level === "critical" ? "ALERT" : "ASSESS";
+    setActiveIndex(STATE_INDEX[targetState] ?? 4);
+
+    // Resume demo cycle after 8s of no updates
+    const resume = setTimeout(() => {
+      demoTimerRef.current = setInterval(() => {
+        setActiveIndex((prev) => (prev + 1) % systemStates.length);
+      }, 2500);
+    }, 8000);
+    return () => clearTimeout(resume);
+  }, [latest]);
 
   const currentState = systemStates[activeIndex];
 
@@ -22,10 +52,7 @@ export default function StatusBar() {
         const isActive = i === activeIndex;
         const isPast = i < activeIndex;
         return (
-          <div
-            key={state}
-            className="flex items-center gap-1.5"
-          >
+          <div key={state} className="flex items-center gap-1.5">
             <div
               className="w-2 h-2 rounded-full transition-all duration-300"
               style={{

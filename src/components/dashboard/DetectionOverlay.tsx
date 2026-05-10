@@ -1,11 +1,41 @@
 "use client";
 
 import { detections } from "@/data/mock";
+import { useDistressStream } from "@/lib/useDistressStream";
+
+// Project-Doe pipeline outputs pixel coords — we normalise assuming 640×480.
+// Adjust these if the drone camera runs at a different resolution.
+const FRAME_W = 640;
+const FRAME_H = 480;
+
+function bboxToPercent(bbox: { x1: number; y1: number; x2: number; y2: number }) {
+  const x = (bbox.x1 / FRAME_W) * 100;
+  const y = (bbox.y1 / FRAME_H) * 100;
+  const w = ((bbox.x2 - bbox.x1) / FRAME_W) * 100;
+  const h = ((bbox.y2 - bbox.y1) / FRAME_H) * 100;
+  return { x, y, w, h };
+}
 
 export default function DetectionOverlay() {
+  const { latest } = useDistressStream();
+
+  // Use live detection if available, otherwise fall back to mock
+  const useLive = latest !== null;
+  const liveDetections = useLive
+    ? [
+        {
+          id: latest!.alert.track_id,
+          ...bboxToPercent(latest!.alert.bbox),
+          label: "Person",
+          confidence: latest!.alert.distress_score,
+          distress: latest!.alert.level === "critical",
+        },
+      ]
+    : detections.map((d) => ({ ...d }));
+
   return (
     <div className="absolute inset-0 z-10 pointer-events-none">
-      {detections.map((det) => (
+      {liveDetections.map((det) => (
         <div
           key={det.id}
           className="absolute"
@@ -59,6 +89,9 @@ export default function DetectionOverlay() {
             }`}
           >
             {det.label} — {Math.round(det.confidence * 100)}%
+            {useLive && (
+              <span className="ml-1 text-[9px] opacity-70">LIVE</span>
+            )}
           </div>
 
           {/* Distress indicator */}
