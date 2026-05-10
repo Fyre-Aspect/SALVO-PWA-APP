@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  /* Ocean palette — primary design language */
   --color-ocean-dark: #0a0f1a;
   --color-ocean-darker: #050a12;
   --color-ocean-deep: #001a33;
@@ -9,6 +10,26 @@
   --color-ocean-cyan: #00e5ff;
   --color-ocean-cyan-dim: #00b8d4;
   --color-ocean-glow: rgba(0, 229, 255, 0.15);
+
+  /* Functional severity tokens (used by incident components) */
+  --color-critical: #FF2D2D;
+  --color-critical-dim: #3D0A0A;
+  --color-warning: #FF8C00;
+  --color-warning-dim: #2E1A00;
+  --color-safe: #00C896;
+  --color-safe-dim: #002E22;
+  --color-accent: #00e5ff;
+  --color-accent-dim: rgba(0, 229, 255, 0.08);
+
+  /* Surface tokens mapped to ocean palette */
+  --color-bg: #050a12;
+  --color-surface: #0a0f1a;
+  --color-surface-2: #0d1624;
+  --color-border: rgba(0, 61, 102, 0.4);
+  --color-border-bright: rgba(0, 229, 255, 0.2);
+  --color-text-primary: #e0e8f0;
+  --color-text-secondary: #8899aa;
+  --color-text-dim: #445566;
 }
 
 html {
@@ -17,41 +38,117 @@ html {
 
 body {
   background-color: var(--color-ocean-dark);
-  color: #e0e8f0;
+  color: var(--color-text-primary);
   font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-ocean-darker);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-ocean-surface);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-ocean-blue);
-}
+/* ─────────────────  Scrollbars  ───────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-ocean-darker); }
+::-webkit-scrollbar-thumb { background: var(--color-ocean-surface); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-ocean-blue); }
 
-/* Glow utility */
+/* ─────────────────  Glow utilities  ───────────────── */
 .glow-cyan {
   box-shadow: 0 0 20px rgba(0, 229, 255, 0.3), 0 0 60px rgba(0, 229, 255, 0.1);
 }
-
 .glow-cyan-sm {
   box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
 }
-
 .text-glow-cyan {
   text-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
 }
 
-/* Glass card utility */
+/* ─────────────────  Glass card  ───────────────── */
 .glass-card {
   background: rgba(0, 26, 51, 0.6);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 229, 255, 0.1);
+}
+
+/* Bento card used by MagicBento */
+.bento-card {
+  background: rgba(0, 26, 51, 0.4);
+  border: 1px solid rgba(0, 229, 255, 0.12);
+  border-radius: 12px;
+  transition: border-color 0.2s;
+}
+.bento-card:hover {
+  border-color: rgba(0, 229, 255, 0.3);
+}
+
+/* ─────────────────  Tactical grid (dashboard)  ───────────────── */
+.tactical-grid {
+  background-image:
+    linear-gradient(to right, rgba(0, 61, 102, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 61, 102, 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─────────────────  Form controls  ───────────────── */
+input, select, textarea {
+  font-family: inherit;
+  background-color: rgba(0, 26, 51, 0.5);
+  color: var(--color-text-primary);
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  border-radius: 8px;
+  padding: 11px 14px;
+  transition: border-color 0.18s, background-color 0.18s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-ocean-cyan);
+  outline: none;
+  background-color: rgba(0, 26, 51, 0.7);
+  box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.08);
+}
+input::placeholder, textarea::placeholder {
+  color: var(--color-text-dim);
+}
+
+/* ─────────────────  Keyframes  ───────────────── */
+@keyframes salvo-pulse-critical {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 45, 45, 0.45); }
+  50%       { box-shadow: 0 0 0 12px rgba(255, 45, 45, 0); }
+}
+@keyframes salvo-pulse-cyan {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4); }
+  50%       { box-shadow: 0 0 0 12px rgba(0, 229, 255, 0); }
+}
+@keyframes salvo-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+@keyframes salvo-log-scroll {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+@keyframes salvo-pulse-marker {
+  0%  { transform: scale(1); opacity: 0.8; }
+  70% { transform: scale(2.2); opacity: 0; }
+  100%{ transform: scale(2.2); opacity: 0; }
+}
+@keyframes scanline {
+  0%   { top: 0; }
+  100% { top: 100%; }
+}
+@keyframes waves {
+  0%   { background-position: 0 0; }
+  100% { background-position: 100px 0; }
+}
+
+.animate-pulse-critical { animation: salvo-pulse-critical 1.8s ease-out infinite; }
+.animate-blink          { animation: salvo-blink 0.9s ease-in-out infinite; }
+.animate-log-scroll     { animation: salvo-log-scroll 28s linear infinite; }
+
+/* Focus rings */
+:focus-visible {
+  outline: 2px solid var(--color-ocean-cyan);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-critical, .animate-blink, .animate-log-scroll { animation: none !important; }
+  html { scroll-behavior: auto; }
 }

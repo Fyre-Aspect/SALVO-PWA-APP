@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#080A0C"/>
+  <rect x="60" y="120" width="36" height="272" fill="#FF2D2D"/>
+  <text x="128" y="332" font-family="'Syne','Inter',sans-serif" font-weight="800" font-size="168" fill="#E8EDF2" letter-spacing="-6">SALVO</text>
+</svg>
