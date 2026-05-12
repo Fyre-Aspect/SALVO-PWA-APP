@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { AppProvider } from "@/context/AppContext";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
