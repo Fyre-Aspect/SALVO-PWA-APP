@@ -1,0 +1,49 @@
+type User @table {
+  displayName: String!
+  role: String!
+  createdAt: Timestamp!
+  email: String
+  phoneNumber: String
+  assignedZone: BeachZone
+}
+
+type Drone @table {
+  droneId: String!
+  status: String!
+  lastLocation: String!
+  createdAt: Timestamp!
+  model: String
+  batteryLevel: Int
+  lastFlightTime: Timestamp
+}
+
+type Alert @table {
+  alertId: String!
+  timestamp: Timestamp!
+  location: String!
+  severity: String!
+  status: String!
+  drone: Drone
+  user: User
+  detectionConfidence: Float
+  droneFootageUrl: String
+}
+
+type BeachZone @table {
+  zoneName: String!
+  coordinates: String!
+  createdAt: Timestamp!
+  description: String
+  assignedLifeguardTeam: String
+}
+
+type IncidentLog @table {
+  incidentId: String!
+  alertTimestamp: Timestamp!
+  resolutionTimestamp: Timestamp!
+  resolutionDetails: String!
+  alert: Alert
+  user: User
+  lifeguardArrivalTime: Timestamp
+  outcome: String
+}

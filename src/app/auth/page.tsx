@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { signIn, signUp } from "@/services/firebase";
+import { signIn, signUp, signInWithGoogle } from "@/services/firebase";
 import { useApp } from "@/context/AppContext";
 import { sampleZones } from "@/data/mockIncident";
 import Aurora from "@/components/reactbits/Aurora";
@@ -30,12 +30,12 @@ function AuthInner() {
     search.get("mode") === "register" ? "register" : "signin"
   );
   const [submitting, setSubmitting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    certificationId: "",
     zone: sampleZones[0],
   });
 
@@ -58,7 +58,6 @@ function AuthInner() {
       e.password = "Password must be at least 6 characters.";
     if (mode === "register") {
       if (!form.name) e.name = "Enter your full name.";
-      if (!form.certificationId) e.certificationId = "Certification ID is required.";
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -76,7 +75,6 @@ function AuthInner() {
               name: form.name,
               email: form.email,
               password: form.password,
-              certificationId: form.certificationId,
               zone: form.zone,
             });
       setUser(result.user);
@@ -85,6 +83,21 @@ function AuthInner() {
       setErrors({ form: "Authentication failed. Please try again." });
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setGoogleLoading(true);
+    setErrors({});
+    try {
+      const result = await signInWithGoogle();
+      setUser(result.user);
+      router.push(search.get("redirect") || "/dashboard");
+    } catch (err: any) {
+      console.error(err);
+      setErrors({ form: "Google Sign-In failed. Please try again." });
+    } finally {
+      setGoogleLoading(false);
     }
   }
 
@@ -212,36 +225,20 @@ function AuthInner() {
           </Field>
 
           {mode === "register" && (
-            <>
-              <Field label="Certification ID" error={errors.certificationId} htmlFor="cert">
-                <input
-                  id="cert"
-                  type="text"
-                  value={form.certificationId}
-                  onChange={(e) => update("certificationId", e.target.value)}
-                  placeholder="e.g. SG-04821"
-                  className="w-full"
-                  style={
-                    errors.certificationId ? { borderColor: "var(--color-critical)" } : undefined
-                  }
-                />
-              </Field>
-
-              <Field label="Region / Zone" htmlFor="zone">
-                <select
-                  id="zone"
-                  value={form.zone}
-                  onChange={(e) => update("zone", e.target.value)}
-                  className="w-full"
-                >
-                  {sampleZones.map((z) => (
-                    <option key={z} value={z}>
-                      {z}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-            </>
+            <Field label="Region / Zone" htmlFor="zone">
+              <select
+                id="zone"
+                value={form.zone}
+                onChange={(e) => update("zone", e.target.value)}
+                className="w-full"
+              >
+                {sampleZones.map((z) => (
+                  <option key={z} value={z}>
+                    {z}
+                  </option>
+                ))}
+              </select>
+            </Field>
           )}
 
           {errors.form && (
@@ -252,8 +249,8 @@ function AuthInner() {
 
           <button
             type="submit"
-            disabled={submitting}
-            className="w-full py-3 rounded-lg font-semibold text-sm transition-all glow-cyan-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={submitting || googleLoading}
+            className="w-full py-3 rounded-lg font-semibold text-sm transition-all glow-cyan-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             style={{
               background: "var(--color-ocean-cyan)",
               color: "var(--color-ocean-darker)",
@@ -269,6 +266,50 @@ function AuthInner() {
             ) : (
               "Create Account"
             )}
+          </button>
+
+          {/* Divider */}
+          <div className="flex items-center my-4">
+            <div className="flex-grow border-t" style={{ borderColor: "rgba(0,229,255,0.1)" }} />
+            <span className="px-3 text-[10px] font-mono" style={{ color: "var(--color-text-dim)" }}>OR</span>
+            <div className="flex-grow border-t" style={{ borderColor: "rgba(0,229,255,0.1)" }} />
+          </div>
+
+          {/* Google Button */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={submitting || googleLoading}
+            className="w-full py-3 rounded-lg border font-semibold text-sm transition-all hover:bg-white/5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            style={{
+              borderColor: "rgba(0,229,255,0.3)",
+              background: "rgba(0,26,51,0.2)",
+              color: "#ffffff",
+            }}
+          >
+            {googleLoading ? (
+              <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24">
+                <path
+                  fill="#EA4335"
+                  d="M12 5.04c1.67 0 3.2.58 4.38 1.69l3.27-3.27C17.67 1.62 14.99 1 12 1 7.35 1 3.39 3.65 1.34 7.55l3.96 3.07C6.26 7.42 8.92 5.04 12 5.04z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.43c-.28 1.44-1.09 2.67-2.31 3.5l3.6 2.79c2.1-1.94 3.3-4.79 3.3-8.17z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.3 14.88c-.24-.72-.38-1.5-.38-2.31s.14-1.59.38-2.31L1.34 7.55C.49 9.24 0 11.12 0 13s.49 3.76 1.34 5.45l3.96-3.07z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.6-2.79c-1-.67-2.28-1.07-3.96-1.07-3.08 0-5.74-2.38-6.7-5.58l-3.96 3.07C3.39 20.35 7.35 23 12 23z"
+                />
+              </svg>
+            )}
+            {googleLoading ? "Connecting…" : "Continue with Google"}
           </button>
 
           <div className="flex items-center justify-between text-xs" style={{ color: "var(--color-text-secondary)" }}>

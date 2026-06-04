@@ -1,0 +1,51 @@
+mutation CreateUser($displayName: String!, $role: String!, $email: String, $phoneNumber: String) @auth(level: USER, insecureReason: "This operation creates a new user, and it's assumed any logged-in user can create a profile for themselves or be registered by an admin.") {
+  user_insert(data: {
+    displayName: $displayName,
+    role: $role,
+    email: $email,
+    phoneNumber: $phoneNumber,
+    createdAt_expr: "request.time"
+  }) {
+    id
+  }
+}
+
+query GetAllDrones @auth(level: USER, insecureReason: "This operation is safe to expose to all logged-in users who might need to view drone information.") {
+  drones {
+    id
+    droneId
+    status
+    lastLocation
+    batteryLevel
+    model
+    createdAt
+    lastFlightTime
+  }
+}
+
+mutation CreateAlert($alertId: String!, $timestamp: Timestamp!, $location: String!, $severity: String!, $status: String!, $detectionConfidence: Float, $droneFootageUrl: String, $droneId: UUID, $userId: UUID) @auth(level: USER, insecureReason: "This operation creates a new alert, which can be initiated by any logged-in user, likely a drone operator or a lifeguard.") {
+  alert_insert(data: {
+    alertId: $alertId,
+    timestamp: $timestamp,
+    location: $location,
+    severity: $severity,
+    status: $status,
+    detectionConfidence: $detectionConfidence,
+    droneFootageUrl: $droneFootageUrl,
+    droneId: $droneId,
+    userId: $userId
+  }) {
+    id
+  }
+}
+
+query GetBeachZoneDetails($id: UUID!) @auth(level: PUBLIC, insecureReason: "This operation allows anyone to view details of a specific beach zone, which contains no sensitive user data.") {
+  beachZone(id: $id) {
+    id
+    zoneName
+    coordinates
+    description
+    assignedLifeguardTeam
+    createdAt
+  }
+}

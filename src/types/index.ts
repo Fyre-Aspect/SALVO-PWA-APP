@@ -4,7 +4,7 @@ export interface User {
   id: string;
   name: string;
   email?: string;
-  certificationId: string;
+  certificationId?: string;
   zone: string;
   isAuthenticated: boolean;
 }
@@ -34,7 +34,6 @@ export interface SignUpData {
   name: string;
   email: string;
   password: string;
-  certificationId: string;
   zone: string;
 }
 

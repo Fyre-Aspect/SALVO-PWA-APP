@@ -13,6 +13,9 @@ import {
 import type { Incident, LogEntry, Severity, User } from "@/types";
 import { signOut as fbSignOut, subscribeToIncidents } from "@/services/firebase";
 import type { DistressEvent } from "@/lib/distress-store";
+import { auth, db } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 // ─────────────────  State  ─────────────────
 interface AppState {
@@ -136,20 +139,61 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const incidentSubRef = useRef<(() => void) | null>(null);
 
-  // Restore user from localStorage on mount
+  // Restore user session on mount (either via Firebase auth state or localStorage mock fallback)
   useEffect(() => {
-    let user: User | null = null;
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) user = JSON.parse(raw) as User;
-    } catch {
-      user = null;
+    if (!auth || !db) {
+      // Mock fallback: restore user from localStorage
+      let user: User | null = null;
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) user = JSON.parse(raw) as User;
+      } catch {
+        user = null;
+      }
+      dispatch({ type: "HYDRATE", user });
+      return;
     }
-    dispatch({ type: "HYDRATE", user });
+
+    const unsub = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        try {
+          const userDocSnap = await getDoc(doc(db!, "users", fbUser.uid));
+          if (userDocSnap.exists()) {
+            const data = userDocSnap.data();
+            const user: User = {
+              id: fbUser.uid,
+              name: data.name || fbUser.displayName || "Responder",
+              email: fbUser.email || undefined,
+              certificationId: data.certificationId,
+              zone: data.zone || "N/A",
+              isAuthenticated: true,
+            };
+            dispatch({ type: "HYDRATE", user });
+          } else {
+            const user: User = {
+              id: fbUser.uid,
+              name: fbUser.displayName || fbUser.email?.split("@")[0] || "Responder",
+              email: fbUser.email || undefined,
+              zone: "N/A",
+              isAuthenticated: true,
+            };
+            dispatch({ type: "HYDRATE", user });
+          }
+        } catch (err) {
+          console.error("Failed to load user profile from Firestore:", err);
+          dispatch({ type: "HYDRATE", user: null });
+        }
+      } else {
+        dispatch({ type: "HYDRATE", user: null });
+      }
+    });
+
+    return () => unsub();
   }, []);
 
-  // Persist user
+  // Persist user in mock mode
   useEffect(() => {
+    if (auth) return; // If live Firebase auth is present, it handles persistence automatically
     if (!state.hasHydrated) return;
     try {
       if (state.user) localStorage.setItem(STORAGE_KEY, JSON.stringify(state.user));

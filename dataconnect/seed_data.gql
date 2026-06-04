@@ -1,0 +1,110 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "This operation is for seeding data and should only be run by authenticated users for setup.") {
+  user_insertMany(data: [
+    {
+      id: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      displayName: "Alice Smith",
+      role: "Lifeguard",
+      createdAt: "2023-01-15T10:00:00Z",
+      email: "alice.smith@example.com",
+      phoneNumber: "111-222-3333"
+    },
+    {
+      id: "b2c3d4e5-f6a7-8901-2345-67890abcdef0",
+      displayName: "Bob Johnson",
+      role: "Supervisor",
+      createdAt: "2023-01-15T10:05:00Z",
+      email: "bob.johnson@example.com",
+      phoneNumber: "444-555-6666"
+    }
+  ])
+  beachZone_insertMany(data: [
+    {
+      id: "c3d4e5f6-a7b8-9012-3456-7890abcdef01",
+      zoneName: "North Beach",
+      coordinates: "34.0123,-118.4567",
+      createdAt: "2023-01-15T11:00:00Z",
+      description: "Main swimming area",
+      assignedLifeguardTeam: "Alpha"
+    },
+    {
+      id: "d4e5f6a7-b8c9-0123-4567-890abcdef012",
+      zoneName: "South Beach",
+      coordinates: "33.9876,-118.4789",
+      createdAt: "2023-01-15T11:05:00Z",
+      description: "Less crowded, surfing allowed",
+      assignedLifeguardTeam: "Bravo"
+    }
+  ])
+  drone_insertMany(data: [
+    {
+      id: "e5f6a7b8-c9d0-1234-5678-90abcdef0123",
+      droneId: "DRONE-001",
+      status: "Active",
+      lastLocation: "34.0100,-118.4600",
+      createdAt: "2023-01-15T12:00:00Z",
+      model: "DJI Mavic 3",
+      batteryLevel: 85,
+      lastFlightTime: "2023-01-15T11:55:00Z"
+    },
+    {
+      id: "f6a7b8c9-d0e1-2345-6789-0abcdef01234",
+      droneId: "DRONE-002",
+      status: "Charging",
+      lastLocation: "33.9900,-118.4800",
+      createdAt: "2023-01-15T12:05:00Z",
+      model: "Autel Evo Nano+",
+      batteryLevel: 30,
+      lastFlightTime: "2023-01-15T10:30:00Z"
+    }
+  ])
+  alert_insertMany(data: [
+    {
+      id: "01234567-89ab-cdef-0123-456789abcdef",
+      alertId: "ALERT-001",
+      timestamp: "2023-01-15T13:00:00Z",
+      location: "North Beach",
+      severity: "High",
+      status: "New",
+      droneId: "e5f6a7b8-c9d0-1234-5678-90abcdef0123",
+      userId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      detectionConfidence: 0.95,
+      droneFootageUrl: "https://example.com/footage/alert001.mp4"
+    },
+    {
+      id: "12345678-9abc-def0-1234-567890abcdef0",
+      alertId: "ALERT-002",
+      timestamp: "2023-01-15T13:15:00Z",
+      location: "South Beach",
+      severity: "Medium",
+      status: "Investigating",
+      droneId: "f6a7b8c9-d0e1-2345-6789-0abcdef01234",
+      userId: "b2c3d4e5-f6a7-8901-2345-67890abcdef0",
+      detectionConfidence: 0.70,
+      droneFootageUrl: "https://example.com/footage/alert002.mp4"
+    }
+  ])
+  incidentLog_insertMany(data: [
+    {
+      id: "23456789-abcd-ef01-2345-67890abcdef01",
+      incidentId: "INC-001",
+      alertTimestamp: "2023-01-15T13:00:00Z",
+      resolutionTimestamp: "2023-01-15T13:30:00Z",
+      resolutionDetails: "Swimmer rescued successfully.",
+      alertId: "01234567-89ab-cdef-0123-456789abcdef",
+      userId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      lifeguardArrivalTime: "2023-01-15T13:05:00Z",
+      outcome: "Resolved"
+    },
+    {
+      id: "34567890-bcde-f012-3456-7890abcdef012",
+      incidentId: "INC-002",
+      alertTimestamp: "2023-01-15T13:15:00Z",
+      resolutionTimestamp: "2023-01-15T13:50:00Z",
+      resolutionDetails: "Minor injury, first aid administered.",
+      alertId: "12345678-9abc-def0-1234-567890abcdef0",
+      userId: "b2c3d4e5-f6a7-8901-2345-67890abcdef0",
+      lifeguardArrivalTime: "2023-01-15T13:20:00Z",
+      outcome: "Resolved"
+    }
+  ])
+}

@@ -110,7 +110,7 @@ export default function DashboardPage() {
         style={{ borderColor: "rgba(0,61,102,0.4)" }}
       >
         <div className="text-[10px] font-mono text-gray-600">
-          {user.certificationId} · {user.zone}
+          {user.certificationId ? `${user.certificationId} · ` : ""}{user.zone}
         </div>
         <div className="flex items-center gap-2">
           <button
