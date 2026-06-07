@@ -1,19 +1,26 @@
 import Navbar from "@/components/landing/Navbar";
-import Hero from "@/components/landing/Hero";
-import HowItWorks from "@/components/landing/HowItWorks";
-import TechSpecs from "@/components/landing/TechSpecs";
-import ProductShowcase from "@/components/landing/ProductShowcase";
+import ScrollLanding from "@/components/landing/ScrollLanding";
 import Footer from "@/components/landing/Footer";
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen" style={{ backgroundColor: "var(--color-ocean-dark)" }}>
+    <main
+      className="min-h-screen overflow-x-hidden"
+      style={{ backgroundColor: "#050a12" }}
+    >
       <Navbar />
-      <Hero />
-      <HowItWorks />
-      <TechSpecs />
-      <ProductShowcase />
-      <Footer />
+      <ScrollLanding />
+      {/* Footer sits below the 700vh scroll journey in normal flow */}
+      <div
+        className="relative"
+        style={{
+          zIndex: 20,
+          background: "#050a12",
+          borderTop: "1px solid rgba(0,61,102,0.3)",
+        }}
+      >
+        <Footer />
+      </div>
     </main>
   );
 }
