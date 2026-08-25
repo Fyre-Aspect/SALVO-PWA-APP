@@ -10,6 +10,12 @@ interface TrueFocusProps {
   borderColor?: string;
   animationDuration?: number;
   pauseBetweenAnimations?: number;
+  /** Glyph color — defaults to inherited text color */
+  color?: string;
+  /** Halo/depth behind the glyphs, e.g. over a bright sky */
+  textShadow?: string;
+  /** Opacity of the unfocused (blurred) words */
+  dimOpacity?: number;
 }
 
 export default function TrueFocus({
@@ -19,6 +25,9 @@ export default function TrueFocus({
   borderColor = "#00e5ff",
   animationDuration = 0.5,
   pauseBetweenAnimations = 1,
+  color,
+  textShadow,
+  dimOpacity = 0.5,
 }: TrueFocusProps) {
   const words = sentence.split(" ");
   const [focusIndex, setFocusIndex] = useState(0);
@@ -42,10 +51,11 @@ export default function TrueFocus({
             key={index}
             animate={{
               filter: isFocused ? "blur(0px)" : `blur(${blurAmount}px)`,
-              opacity: isFocused ? 1 : 0.5,
+              opacity: isFocused ? 1 : dimOpacity,
             }}
             transition={{ duration: animationDuration, ease: "easeInOut" }}
             className="relative inline-block text-6xl md:text-8xl font-bold tracking-tight"
+            style={{ color, textShadow }}
           >
             {isFocused && (
               <motion.span

@@ -43,6 +43,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Techy readout face — mirrors the drone-mounted display */
+.font-tech {
+  font-family: var(--font-tech), ui-monospace, "Courier New", monospace;
+}
+
 /* ─────────────────  Scrollbars  ───────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--color-ocean-darker); }

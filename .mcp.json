@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "genouk-memory": {
+      "command": "node",
+      "args": [
+        "c:\\Users\\arunp\\.vscode\\extensions\\genouk-dev.genouk-1.0.2\\dist\\mcpServer.js"
+      ],
+      "env": {
+        "GENOUK_REPO": "c:\\Users\\arunp\\SALVO-PWA-APP"
+      }
+    }
+  }
+}
